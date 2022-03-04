@@ -27,6 +27,8 @@ int main()
 		iNumber[idx2] = iTemp;
 	}
 
+	int iBingo = 0;
+
 	while (true)
 	{
 		system("cls");
@@ -45,6 +47,13 @@ int main()
 
 			cout << endl;
 		}
+
+		cout << "Bingo Line : " << iBingo << endl;
+
+		// If there are more than five lines of bingo, the game ends.
+		if (iBingo >= 5)
+			break;
+
 		cout << "Enter number(0 : Quit) : ";
 		int iInput;
 		cin >> iInput;
@@ -73,6 +82,56 @@ int main()
 
 		if (bAcc)
 			continue;
+
+		// Checking the number of bingo lines will count from the beginning every time 
+		// you enter a number. So Assign 0 to the iBingo variable each time.
+		iBingo = 0;
+
+		// Find the number of horizontal and vertical lines.
+		int iStar1 = 0, iStar2 = 0;
+		for (int i = 0; i < 5; ++i)
+		{
+			iStar1 = iStar2 = 0;
+			for (int j = 0; j < 5; ++j)
+			{
+				// Find the horizontal * number
+				if (iNumber[i * 5 + j] == INT_MAX)
+					++iStar1;
+				
+				// Find the vertical * number
+				if (iNumber[j * 5 + i] == INT_MAX)
+					++iStar2;
+			}
+
+			// If iStar1 is  5, bingo
+			if (iStar1 == 5)
+				++iBingo;
+
+			if (iStar2 == 5)
+				++iBingo;
+		}
+
+		// Upper left -> lower right diagonal check.
+		iStar1 = 0;
+		for (int i = 0; i < 25; i += 6)
+		{
+			if (iNumber[i] == INT_MAX)
+				++iStar1;
+		}
+
+		if (iStar1 == 5)
+			++iBingo;
+
+		// Upper right -> lower left diagonal check.
+		iStar1 = 0;
+		for (int i = 4; i <= 20; i += 4)
+		{
+			if (iNumber[i] == INT_MAX)
+				++iStar1;
+		}
+
+		if (iStar1 == 5)
+			++iBingo;
 	}
 
 	return 0;
