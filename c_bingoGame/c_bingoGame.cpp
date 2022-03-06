@@ -9,6 +9,22 @@ enum AI_MODE
 	AM_HARD
 };
 
+enum LINE_NUMBER
+{
+	LN_H1,
+	LN_H2,
+	LN_H3,
+	LN_H4,
+	LN_H5,
+	LN_V1,
+	LN_V2,
+	LN_V3,
+	LN_V4,
+	LN_V5,
+	LN_LT,
+	LN_RT,
+};
+
 int main()
 {
 	srand((unsigned int)time(0));
@@ -193,7 +209,132 @@ int main()
 			iInput = iNoneSelect[rand() % iNoneSelectCount];
 			break;
 		case AM_HARD:
+			// Choose the number of lines with the highest chance of bingo.
+			int iLine;
+			int iStarCount = 0;
+			int iSaveCount = 0;
+			
+			// Find the line with the most * of the horizontal lines.
+			for (int i = 0; i < 5; ++i)
+			{
+				iStarCount = 0;
+				for (int j = 0; j < 5; ++j)
+				{
+					if (iAINumber[i * 5 + j] == INT_MAX)
+					{
+						++iStarCount;
+					}
+				}
+				
+				// Excludes lines with 5 stars
+				if (iStarCount < 5 && iSaveCount < iStarCount)
+				{	
+					// horizontal is 0 ~ 4
+					iLine = i;
+					iSaveCount = iStarCount;
+				}
+			}
+
+			// Find the line with the most * of the vertical lines.
+			for (int i = 0; i < 5; ++i)
+			{
+				iStarCount = 0;
+				for (int j = 0; j < 5; ++j)
+				{
+					if (iAINumber[j * 5 + i] == INT_MAX)
+						++iStarCount;
+				}
+
+				if (iStarCount < 5 && iSaveCount < iStarCount)
+				{
+					// vertical is 5 ~ 9
+					iLine = i + 5;
+					iSaveCount = iStarCount;
+				}
+			}
+
+			// Upper left -> lower right diagonal check.
+			iStarCount = 0;
+			for (int i = 0; i < 25; i += 6)
+			{
+				if (iAINumber[i] == INT_MAX)
+					++iStarCount;
+			}
+
+			if (iStarCount < 5 && iSaveCount < iStarCount)
+			{
+				iLine = LN_LT;
+				iSaveCount = iStarCount;
+			}
+
+			
+			// Upper right -> lower left diagonal check.
+			iStarCount = 0;
+			for (int i = 4; i <= 20; i += 4)
+			{
+				if (iAINumber[i] == INT_MAX)
+					++iStarCount;
+			}
+
+			if (iStarCount < 5 && iSaveCount < iStarCount)
+			{
+				iLine = LN_RT;
+				iSaveCount = iStarCount;
+			}
+
+			// Choose one number from the selected lines.
+			if (iLine <= LN_H5)
+			{
+				// horizontal: iLine = 0 ~ 4
+				for (int i = 0; i < 5; ++i)
+				{
+					if (iAINumber[iLine * 5 + i] != INT_MAX)
+					{
+						iInput = iAINumber[iLine * 5 + i];
+						break;
+					}
+
+				}
+			}
+			
+			else if (iLine <= LN_V5)
+			{
+				// vertical, iLine = 5 ~ 9
+				for (int i = 0; i < 5; ++i)
+				{
+					if (iAINumber[i * 5 + (iLine - 5)] != INT_MAX)
+					{
+						iInput = iAINumber[i * 5 + (iLine - 5)];
+						break;
+					}
+				}
+			}
+
+			else if (iLine == LN_LT)
+			{
+				for (int i = 0; i < 25; i += 6)
+				{
+					if (iAINumber[i] != INT_MAX)
+					{
+						iInput = iAINumber[i];
+						break;
+					}
+				}
+			}
+
+			else if (iLine == LN_RT)
+			{
+				for (int i = 4; i <= 20; i += 4)
+				{
+					if (iAINumber[i] != INT_MAX)
+					{
+						iInput = iAINumber[i];
+						break;
+					}
+				}
+			}
 			break;
+
 		}
 
 		//The number selected by AI is changed to *.
